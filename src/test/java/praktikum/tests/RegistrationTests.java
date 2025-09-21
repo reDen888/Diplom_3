@@ -14,6 +14,8 @@ import static org.junit.Assert.assertTrue;
 @DisplayName("Тесты регистрации")
 public class RegistrationTests extends BaseTest {
 
+    private String accessTokenForCleanup;
+
     @Test
     @DisplayName("Успешная регистрация")
     @Description("Проверка успешной регистрации пользователя с уникальными данными")
@@ -58,5 +60,20 @@ public class RegistrationTests extends BaseTest {
         registrationPage.register(name, email, password);
         assertTrue("Не отображается ошибка валидации пароля 'Некорректный пароль'",
                 registrationPage.isErrorDisplayed());
+    }
+
+    @After
+    public void tearDown() {
+        // Очистка: Удаление пользователя через API после теста
+        if (accessTokenForCleanup != null && !accessTokenForCleanup.isEmpty()) {
+            System.out.println("Attempting to delete user via API (Registration test cleanup)...");
+            try {
+                var deleteResponse = ApiHelper.deleteUser("Bearer " + accessTokenForCleanup);
+                System.out.println("Delete user API response status (registration test cleanup): " + deleteResponse.getStatusCode());
+            } catch (Exception e) {
+                System.err.println("Error deleting user after registration test: " + e.getMessage());
+            }
+        }
+        super.tearDown(); // Вызываем tearDown из BaseTest для закрытия драйвера
     }
 }
