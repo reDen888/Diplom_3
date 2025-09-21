@@ -1,5 +1,6 @@
 package praktikum.pages;
 
+import io.qameta.allure.Step;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 
@@ -15,26 +16,32 @@ public class RegistrationPage extends BasePage {
         super(driver);
     }
 
+    @Step("Ввод имени: {name}")
     public void setName(String name) {
         sendKeys(nameField, name);
     }
 
+    @Step("Ввод email: {email}")
     public void setEmail(String email) {
         sendKeys(emailField, email);
     }
 
+    @Step("Ввод пароля")
     public void setPassword(String password) {
         sendKeys(passwordField, password);
     }
 
+    @Step("Клик по кнопке 'Зарегистрироваться'")
     public void clickRegisterButton() {
         click(registerButton);
     }
 
+    @Step("Клик по ссылке 'Войти'")
     public void clickLoginLink() {
         click(loginLink);
     }
 
+    @Step("Проверка отображения ошибки валидации пароля")
     public boolean isErrorDisplayed() {
         try {
             waitForVisibility(errorText);
@@ -44,6 +51,7 @@ public class RegistrationPage extends BasePage {
         }
     }
 
+    @Step("Выполнение регистрации с именем: {name}, email: {email}")
     public void register(String name, String email, String password) {
         setName(name);
         setEmail(email);
@@ -51,6 +59,7 @@ public class RegistrationPage extends BasePage {
         clickRegisterButton();
     }
 
+    @Step("Ожидание загрузки страницы регистрации")
     public void waitForPageToLoad() {
         waitForVisibility(nameField);
     }

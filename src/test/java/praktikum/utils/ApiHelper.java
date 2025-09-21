@@ -4,29 +4,33 @@ import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import io.restassured.response.ValidatableResponse;
+import praktikum.models.LoginCredentials;
+import praktikum.models.User;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.notNullValue;
 
 public class ApiHelper {
-    private static final String BASE_URI = "https://stellarburgers.nomoreparties.site/api";
+    private static final String BASE_URI = TestUtils.getBaseUrl() + "/api";
 
     static {
         RestAssured.baseURI = BASE_URI;
     }
 
-    public static ValidatableResponse registerUser(String email, String password, String name) {
+    // Используем POJO для сериализации
+    public static ValidatableResponse registerUser(User user) {
         return given()
                 .contentType(ContentType.JSON)
-                .body("{ \"email\": \"" + email + "\", \"password\": \"" + password + "\", \"name\": \"" + name + "\" }")
+                .body(user)
                 .when()
                 .post("/auth/register")
                 .then();
     }
 
-    public static ValidatableResponse loginUser(String email, String password) {
+    // Используем POJO для сериализации
+    public static ValidatableResponse loginUser(LoginCredentials credentials) {
         return given()
                 .contentType(ContentType.JSON)
-                .body("{ \"email\": \"" + email + "\", \"password\": \"" + password + "\" }")
+                .body(credentials)
                 .when()
                 .post("/auth/login")
                 .then();
@@ -42,11 +46,10 @@ public class ApiHelper {
 
     // Метод для удобного получения токена из ответа логина
     public static String extractAccessToken(ValidatableResponse loginResponse) {
-        // Проверяем, что токен присутствует
         loginResponse.assertThat().body("accessToken", notNullValue());
         // Извлекаем токен (убираем "Bearer " префикс, если он есть)
         String fullToken = loginResponse.extract().path("accessToken");
-        if (fullToken.startsWith("Bearer ")) {
+        if (fullToken != null && fullToken.startsWith("Bearer ")) {
             return fullToken.substring(7); // "Bearer ".length()
         }
         return fullToken;
